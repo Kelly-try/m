@@ -1,6 +1,433 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+   
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>kelly-try · 全程夜间模式</title>
+  <!-- 全程夜间模式 · 深色沉浸体验 -->
+  <style>
+    /* 全局重置 & 夜间模式基础 —— 全程无亮色干扰 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #0b0d10;   /* 深邃黑灰底 */
+      color: #e3e6ea;             /* 柔白字体，不刺眼 */
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.2s ease;
+    }
+
+    /* 所有卡片、容器、边框默认深色系 */
+    .card, .container, section, .glass {
+      background: #14171c;         /* 深灰卡片 */
+      border: 1px solid #2a2e34;
+      border-radius: 36px;
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    /* 主容器 — 全程夜间模式核心区块 */
+    .night-container {
+      max-width: 720px;
+      width: 100%;
+      background: #12151b;          /* 比body稍亮，层次感 */
+      backdrop-filter: blur(2px);
+      padding: 2.8rem 2.5rem;
+      border-radius: 48px;
+      border: 1px solid #2a2e34;
+      box-shadow: 0 30px 50px -18px #000000cc, inset 0 1px 0 #3a3f47;
+      transition: all 0.2s;
+    }
+
+    /* 头像/标识 — 夜间柔和 */
+    .avatar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .avatar-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 40px;
+      background: #1f242b;
+      border: 1px solid #3a404a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 500;
+      color: #cbd0d8;
+      box-shadow: inset 0 4px 6px rgba(0,0,0,0.6);
+    }
+
+    .avatar-text {
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: #eef1f5;
+    }
+    .avatar-text small {
+      font-weight: 400;
+      font-size: 0.9rem;
+      color: #8b919c;
+      margin-left: 6px;
+    }
+
+    /* 标题 —— 夜间模式下的强调 */
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 0.4rem;
+      color: #f0f3f7;
+      text-shadow: 0 2px 3px rgba(0,0,0,0.5);
+    }
+
+    .subhead {
+      font-size: 1.2rem;
+      color: #a9b1bc;
+      margin-bottom: 2rem;
+      border-left: 3px solid #3e4550;
+      padding-left: 1rem;
+      font-weight: 350;
+    }
+
+    /* 特性网格 — 全程深色 */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 2rem 0 2.2rem;
+    }
+
+    .feature-item {
+      background: #1b1f26;
+      border-radius: 28px;
+      padding: 1.4rem 1.2rem;
+      border: 1px solid #2b313a;
+      transition: all 0.15s ease;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+      color: #d3d9e0;
+    }
+
+    .feature-item:hover {
+      background: #232830;
+      border-color: #3f4753;
+      transform: scale(1.01);
+    }
+
+    .feature-item .emoji-big {
+      font-size: 1.8rem;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .feature-item h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e6eaef;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-item p {
+      font-size: 0.9rem;
+      color: #9ea6b2;
+      margin-top: 6px;
+    }
+
+    /* 分割线 — 夜间弱化 */
+    .divider {
+      margin: 2rem 0;
+      border: 0;
+      height: 1px;
+      background: linear-gradient(90deg, #2c323b, #3f4652, #2c323b);
+      opacity: 0.6;
+    }
+
+    /* 代码/链接区块 — 依然深色 */
+    .code-snippet {
+      background: #0f1218;
+      border-radius: 28px;
+      padding: 1.5rem 1.8rem;
+      border: 1px solid #293039;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.95rem;
+      color: #cbd2dc;
+      margin: 1.8rem 0;
+      box-shadow: inset 0 6px 10px rgba(0,0,0,0.6);
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .code-snippet span.tag {
+      color: #8d99a8;
+    }
+    .code-snippet span.key {
+      color: #b7c9e2;
+    }
+    .code-snippet span.str {
+      color: #b5d0b0;
+    }
+    .code-snippet span.cmt {
+      color: #6a737f;
+      font-style: italic;
+    }
+
+    /* 按钮 — 夜间模式专属 */
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      background: #21272f;
+      border: 1px solid #38404b;
+      color: #e0e5ec;
+      padding: 0.8rem 1.8rem;
+      border-radius: 60px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: default;
+      transition: 0.15s;
+      box-shadow: 0 6px 10px rgba(0,0,0,0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.2px;
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-primary {
+      background: #2d3541;
+      border-color: #4d5665;
+      color: #f2f6fc;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.6), inset 0 1px 0 #5c6678;
+    }
+
+    .btn-primary:hover {
+      background: #38424f;
+      border-color: #606b7c;
+    }
+
+    .btn i {
+      font-style: normal;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .badge-night {
+      background: #1c2129;
+      border-radius: 40px;
+      padding: 0.2rem 1rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #9aa3b0;
+      border: 1px solid #323a46;
+      margin-left: 8px;
+    }
+
+    /* 底部 — 暗色 */
+    .footer-note {
+      margin-top: 2.8rem;
+      font-size: 0.85rem;
+      color: #6d7685;
+      text-align: center;
+      border-top: 1px solid #262d36;
+      padding-top: 1.8rem;
+      width: 100%;
+    }
+
+    .footer-note a {
+      color: #a0aab9;
+      text-decoration: none;
+      border-bottom: 1px dotted #3d4654;
+    }
+
+    .footer-note a:hover {
+      color: #ced6e0;
+      border-bottom: 1px solid #6a768a;
+    }
+
+    /* 全程夜间模式 —— 输入框、滚动条、选择等均保持深色 */
+    ::-webkit-scrollbar {
+      width: 8px;
+      background: #11151b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2f3743;
+      border-radius: 12px;
+      border: 1px solid #1e232b;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0e1219;
+    }
+
+    /* 任何链接、按钮默认无蓝色高亮，采用夜间灰 */
+    a, button {
+      color: inherit;
+    }
+
+    /* 移动端调整 */
+    @media (max-width: 480px) {
+      .night-container {
+        padding: 1.8rem 1.2rem;
+        border-radius: 32px;
+      }
+      h1 {
+        font-size: 2.2rem;
+      }
+      .feature-grid {
+        grid-template-columns: 1fr;
+        gap: 0.9rem;
+      }
+      .avatar-text {
+        font-size: 1.2rem;
+      }
+    }
+
+    /* 夜晚星空点缀（纯粹氛围） */
+    .night-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 30%, rgba(70, 90, 120, 0.03) 0%, transparent 60%),
+                  radial-gradient(circle at 80% 70%, rgba(100, 120, 160, 0.02) 0%, transparent 50%);
+      pointer-events: none;
+      border-radius: inherit;
+    }
+
+    .night-container {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 确保所有文字在夜间清晰 */
+    .glow-text {
+      color: #eef2f8;
+    }
+  </style>
+</head>
+<body>
+  <div class="night-container">
+    <!-- 头像 & 品牌 -->
+    <div class="avatar">
+      <div class="avatar-icon">🌙</div>
+      <div class="avatar-text">
+        kelly-try
+        <small>· 夜间</small>
+        <span class="badge-night">全程 dark</span>
+      </div>
+    </div>
+
+    <h1>全程夜间模式</h1>
+    <div class="subhead">
+      ⚡ 深色 · 低蓝光 · 沉浸
+    </div>
+
+    <!-- 3个特性卡片 —— 全夜间适配 -->
+    <div class="feature-grid">
+      <div class="feature-item">
+        <span class="emoji-big">🌃</span>
+        <h3>暗色永恒</h3>
+        <p>所有元素强制深色，无惧日间切换</p>
+      </div>
+      <div class="feature-item">
+        <span class="emoji-big">🕶️</span>
+        <h3>低眩光</h3>
+        <p>柔和对比，长时间浏览舒适</p>
+      </div>
+      <div class="feature-item">
+        <span class="emoji-big">🧘</span>
+        <h3>专注沉浸</h3>
+        <p>减少视觉噪声，聚焦内容</p>
+      </div>
+      <div class="feature-item">
+        <span class="emoji-big">🌌</span>
+        <h3>星光点缀</h3>
+        <p>细微径向光晕，增添层次</p>
+      </div>
+    </div>
+
+    <!-- 代码块：展示“全程夜间模式”配置示意 -->
+    <div class="code-snippet">
+      <span class="cmt">/* kelly-try.github.io 全程夜间模式 */</span>
+      <span class="tag">:root</span> {
+      <span class="key">--bg-primary</span>: <span class="str">#0b0d10</span>;
+      <span class="key">--bg-card</span>:   <span class="str">#14171c</span>;
+      <span class="key">--text-main</span>:  <span class="str">#e3e6ea</span>;
+      <span class="key">--border-dim</span>: <span class="str">#2a2e34</span>;
+      }
+      <span class="cmt">/* 所有组件强制夜间 · 无亮色泄漏 */</span>
+    </div>
+
+    <!-- 按钮组: 模拟交互 (仅展示) -->
+    <div class="btn-group">
+      <span class="btn btn-primary">
+        <i>🌙</i> 夜间持续
+      </span>
+      <span class="btn">
+        <i>⭐</i> 暗色主题
+      </span>
+      <span class="btn">
+        <i>🔮</i> 深空模式
+      </span>
+    </div>
+
+    <!-- 分割线 -->
+    <hr class="divider">
+
+    <!-- 描述文本：全程夜间模式说明 -->
+    <p style="color: #bcc3ce; margin: 0.5rem 0 0.2rem; font-size: 0.98rem; letter-spacing: 0.2px;">
+      <span style="display: inline-block; background: #1d232b; padding: 0.1rem 0.8rem; border-radius: 40px; border: 1px solid #33404d; font-size: 0.75rem; margin-right: 6px;">🌙</span> 
+      此页面为 <strong style="color: #e6ecf3; font-weight: 500;">kelly-try.github.io</strong> 全程夜间模式演示。
+      所有背景、卡片、文字、边框、滚动条、按钮均采用深色设计，无任何日间亮色干扰。
+      适配移动端与桌面端，始终如一。
+    </p>
+
+    <!-- footer 链接 -->
+    <div class="footer-note">
+      <span>🌌 全程夜间 · 自动适应环境光 (模拟) </span><br>
+      <span style="opacity: 0.6; font-size: 0.8rem;">
+        <a href="#" onclick="return false;">kelly-try</a> · 深色体验 · 2026
+      </span>
+    </div>
+  </div>
+
+  <!-- 简单JS：仅用于控制台提示，不影响夜间模式 —— 纯展示 -->
+  <script>
+    (function() {
+      console.log('🌙 kelly-try.github.io · 全程夜间模式已激活');
+      console.log('所有样式均为深色，无亮色泄漏。');
+      // 可添加动态夜间标识 (仅做演示)
+      const container = document.querySelector('.night-container');
+      if (container) {
+        // 确保夜间类 (已经全部是夜间)
+        container.setAttribute('data-night', 'true');
+      }
+    })();
+  </script>
+</body>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>枝繁葉茂</title>
